@@ -1,0 +1,145 @@
+/* static/style.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+header {
+    background-color: #007bff;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+h1 {
+    margin: 0;
+}
+
+.main-container {
+    display: flex;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+.game-area {
+    flex: 2;
+    padding-right: 20px;
+}
+
+.sidebar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* --- Grid Styling --- */
+.grid {
+    display: grid;
+    /* Uses CSS variable set in HTML */
+    grid-template-columns: repeat(var(--grid-size), 100px); 
+    grid-template-rows: repeat(var(--grid-size), 100px);
+    width: fit-content;
+    border: 3px solid #333;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.cell {
+    border: 1px solid #aaa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    user-select: none;
+    background-color: #f9f9f9; /* Unknown */
+    color: #333;
+}
+
+.cell:hover {
+    box-shadow: inset 0 0 0 2px #007bff;
+}
+
+/* Agent States/Knowledge */
+.cell.visited {
+    background-color: #e0f7fa; /* Light Cyan */
+}
+
+.cell.safe {
+    background-color: #e6ffe6; /* Light Green (Proven Safe/Unvisited) */
+}
+
+.cell.danger-low {
+    background-color: #fff3e0; /* Light Orange (Low/Moderate Probability) */
+}
+
+.cell.danger-high {
+    background-color: #ffcccc; /* Light Red (High Probability / Certain Danger) */
+    animation: pulse-danger 1s infinite alternate;
+}
+
+@keyframes pulse-danger {
+    from { box-shadow: 0 0 5px #ff0000; }
+    to { box-shadow: 0 0 10px #ff0000; }
+}
+
+/* Agent Icon */
+.cell[data-symbol="A"] {
+    background-color: #ffc107 !important; /* Yellow */
+    color: #333;
+    font-size: 28px;
+}
+
+/* --- Sidebar Styling --- */
+.status-box, .controls-box, .query-box {
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.status-ok { color: green; font-weight: bold; }
+.status-danger { color: red; font-weight: bold; }
+.status-warning { color: orange; font-weight: bold; }
+
+.controls-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.move-btn {
+    grid-column: span 1;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+.move-btn:nth-child(1) { grid-column: 2 / 3; } /* UP */
+.move-btn:nth-child(2) { grid-column: 1 / 2; } /* LEFT */
+.move-btn:nth-child(4) { grid-column: 2 / 3; } /* DOWN */
+
+.move-btn:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+.move-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.legend {
+    margin-top: 10px;
+    font-size: 0.9em;
+    padding: 5px;
+    background-color: #eee;
+    border-radius: 4px;
+}
