@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wumpus World Agent Simulator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Wumpus World Agent Simulator</h1>
+        <p>Agent's Goal: Explore for 10 moves, updating knowledge base.</p>
+    </header>
+
+    <div class="main-container">
+        <div class="game-area">
+            <h2>Agent Knowledge Map (0-indexed)</h2>
+            <div id="grid-display" class="grid" style="--grid-size: {{ size }};">
+                </div>
+            <div class="legend">
+                A=Agent, V=Visited, S=Safe/Unvisited, B/S=Breeze/Stench, G=Glitter, ?=Unknown
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="status-box">
+                <h2>Agent Status</h2>
+                <div id="status-display">
+                    <p><strong>Status:</strong> <span id="agent-alive" class="status-ok">INITIALIZING...</span></p>
+                    <p><strong>Moves:</strong> <span id="moves-count">0</span> / <span id="max-moves">{{ session.get('config', {}).get('MAX_MOVES', 10) }}</span></p>
+                    <p><strong>Position:</strong> <span id="agent-pos">N/A</span></p>
+                    <p><strong>Last Action:</strong> <span id="last-action">Game initialized.</span></p>
+                </div>
+            </div>
+
+            <div class="controls-box">
+                <h2>Controls (1-indexed input)</h2>
+                <div class="controls-grid">
+                    <button class="move-btn" onclick="makeMove('up')">UP</button>
+                    <button class="move-btn" onclick="makeMove('left')">LEFT</button>
+                    <button class="move-btn" onclick="makeMove('right')">RIGHT</button>
+                    <button class="move-btn" onclick="makeMove('down')">DOWN</button>
+                </div>
+            </div>
+            
+            <div class="query-box">
+                <h2>KB Query Result (Click a cell!)</h2>
+                <p>Click any cell on the grid above to query the agent's knowledge about that chamber. </p>
+                <div id="query-result-display">
+                    <p><strong>Chamber:</strong> <span id="query-coords">N/A</span></p>
+                    <p><strong>KB Status:</strong> <span id="query-status">...</span></p>
+                    <p><strong>Observed Percepts:</strong> <span id="query-percepts">...</span></p>
+                    <p><strong>Inferred Percepts:</strong> <span id="query-inferred">...</span></p>
+                    <p><strong>Prob. Pit:</strong> <span id="query-prob-pit">...</span></p>
+                    <p><strong>Prob. Wumpus:</strong> <span id="query-prob-wumpus">...</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Core Functions ---
+
+        async function fetchState() {
+            const response = await fetch('/state');
+            return response.json();
+        }
+
+        async function updatePage() {
+            try {
+                const state = await fetchState();
+                renderGrid(state.grid_data, state.grid_size);
+                updateStatus(state.agent_status);
+                
+                // Disable controls if game is over
+                if (state.agent_status.game_over) {
+                    document.querySelectorAll('.move-btn').forEach(btn => btn.disabled = true);
+                }
+
+            } catch (error) {
+                console.error("Error fetching state:", error);
+            }
+        }
+
+        function renderGrid(gridData, size) {
+            const gridDisplay = document.getElementById('grid-display');
+            gridDisplay.innerHTML = ''; // Clear previous grid
+
+            // Set CSS grid size dynamically
+            gridDisplay.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+            gridDisplay.style.gridTemplateRows = `repeat(${size}, 1fr)`;
+            
+            gridData.forEach(cell => {
+                const cellElement = document.createElement('div');
+                cellElement.className = 'cell ' + cell.class;
+                cellElement.textContent = cell.symbol;
+                
+                // Add click listener for KB Query
+                cellElement.onclick = () => handleQueryClick(cell.r_1idx, cell.c_1idx);
+
+                gridDisplay.appendChild(cellElement);
+            });
+        }
+        
+        function updateStatus(status) {
+            const aliveElement = document.getElementById('agent-alive');
+            document.getElementById('moves-count').textContent = status.moves_made;
+            document.getElementById('max-moves').textContent = status.max_moves;
+            document.getElementById('agent-pos').textContent = `(${status.current_pos[0]}, ${status.current_pos[1]})`;
+            
+            if (status.game_over) {
+                aliveElement.textContent = status.alive ? "MOVES EXHAUSTED" : "DECEASED";
+                aliveElement.className = status.alive ? "status-warning" : "status-danger";
+            } else {
+                aliveElement.textContent = "ALIVE";
+                aliveElement.className = "status-ok";
+            }
+        }
+
+        async function makeMove(direction) {
+            const lastActionElement = document.getElementById('last-action');
+            lastActionElement.textContent = `Attempting to move ${direction.toUpperCase()}...`;
+            
+            const response = await fetch(`/move/${direction}`, { method: 'POST' });
+            const result = await response.json();
+            
+            lastActionElement.textContent = result.message;
+            await updatePage();
+        }
+        
+        async function handleQueryClick(r, c) {
+            const response = await fetch(`/query/${r}/${c}`);
+            const result = await response.json();
+            
+            document.getElementById('query-coords').textContent = `(${r}, ${c})`;
+            document.getElementById('query-status').textContent = result.status;
+            document.getElementById('query-percepts').textContent = result.percepts_observed;
+            document.getElementById('query-inferred').textContent = result.inferred_percepts || 'None';
+            document.getElementById('query-prob-pit').textContent = `${(result.prob_pit * 100).toFixed(1)}%`;
+            document.getElementById('query-prob-wumpus').textContent = `${(result.prob_wumpus * 100).toFixed(1)}%`;
+        }
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            updatePage();
+        });
+    </script>
+</body>
+</html>
