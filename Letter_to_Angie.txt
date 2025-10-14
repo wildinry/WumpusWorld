@@ -1,0 +1,28 @@
+# Letter_to_Angie.txt
+
+Tuesday, October 14, 2025
+
+Dear Angie,
+
+We were delighted to hear from you and are happy to assist with the Wumpus World booth for the fair. It sounds like a fun (and challenging) project for a Foundations of Artificial Intelligence class.
+
+We have successfully programmed an agent that meets all of your specifications. Our solution is a fully functional Python-based program that uses the Flask framework to provide a visually engaging web interface, moving it far beyond simple terminal text.
+
+### Program Capabilities:
+
+1.  **Initialization:** The program successfully loads the cave system configuration from a `.txt` file, allowing for easy setup of different rounds (as required for the in-class demonstration).
+2.  **Agent Logic:** The agent explores the 4x4 grid and is currently limited to your requested ten moves (if not forced into a deadly chamber earlier). After each move, it performs an observation and updates its internal **Knowledge Base (KB)**.
+3.  **Knowledge Base Update:** Our logic strictly adheres to the rules of inference (e.g., Stench means Wumpus is adjacent). The probability calculation is implemented as requested: for a percept (Breeze/Stench), the probability of the corresponding danger (Pit/Wumpus) is distributed equally among all adjacent **unknown** chambers.
+4.  **Query Interface:** The web interface allows your friend to click on any chamber to query its status. The system replies with:
+    * **SAFE** (confirmed no Pit/Wumpus).
+    * **UNKNOWN** (unvisited, not yet proven safe).
+    * **DEFINITELY DANGEROUS** (Prob = 1.0).
+    * **Percept Information** (Breeze/Stench, if visited).
+    * **Probability of Pit/Wumpus** (0.0 to 1.0).
+
+The complete code, along with the `README.txt` and initial `KB.txt`, will be provided via the Canvas link. We look forward to the in-class demonstration on October 21st. We appreciate the opportunity to apply our learning to a real-world (or at least, fair-world) application!
+
+Sincerely,
+
+[Your Name / Group Name]
+Foundations of Artificial Intelligence Student
