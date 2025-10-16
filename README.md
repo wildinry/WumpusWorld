@@ -13,6 +13,11 @@ This project implements a Wumpus World exploring agent using Python and the Flas
 * **Interface:** A web page served by Flask allows for move controls and a visual representation of the agent's knowledge map.
 
 ## Requirements and Setup
+Optional: you may want to start a virtual environment with the following commands
+```bash
+python -m venv venv     # creates a virtual environment called "venv"
+source ./venv/bin/activate
+```
 1.  **Dependencies:** Ensure Python 3 is installed. Install Flask:
     ```bash
     pip install Flask
