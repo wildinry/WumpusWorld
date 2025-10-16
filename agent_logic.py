@@ -1,7 +1,9 @@
-import math
+#import math
 
 class AgentKnowledge:
-    """Manages the agent's internal knowledge base and inference, prioritizing propositional deduction."""
+    """
+    Manages the agent's internal knowledge base and inference, prioritizing propositional deduction.
+    """
     
     def __init__(self, size, start_pos):
         self.size = size
@@ -16,8 +18,12 @@ class AgentKnowledge:
             } for _ in range(size)] for _ in range(size)
         ]
         
-        # Start cell is always safe
-        self.knowledge_map[start_pos[0]][start_pos[1]]['is_safe'] = True
+        assert start_pos == (0, 0), "Start position is not where we expected!"
+        # Start cells are always safe
+        self.knowledge_map[0][0]['is_safe'] = True
+        self.knowledge_map[0][1]['is_safe'] = True
+        self.knowledge_map[1][0]['is_safe'] = True
+        self.knowledge_map[1][1]['is_safe'] = True
         self.start_pos = start_pos # Store for reference
 
     def _get_neighbors(self, r, c):

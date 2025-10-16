@@ -1,8 +1,12 @@
 # wumpus_config.txt
 # Initializes a 4x4 Wumpus World. Coordinates are 1-indexed (1,1) to (4,4).
 
+SIZE: 4
+MAX_MOVES: 10
+START: 1 1  
+# Agent always starts at (1,1)
+
 # Danger/Goal Positions (1-indexed, using Angie's requested notation)
-W[3,4]
-G[2,3]
-P[3,3]
-P[4,4]
+WUMPUS: 3 4
+GOLD: 2 3
+PITS: 2 2, 4 4

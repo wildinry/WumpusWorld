@@ -60,6 +60,8 @@ h1 {
     user-select: none;
     background-color: #f9f9f9; /* Unknown */
     color: #333;
+    height: 4rem;
+    width: 4rem;
 }
 
 .cell:hover {
@@ -68,19 +70,25 @@ h1 {
 
 /* Agent States/Knowledge */
 .cell.visited {
-    background-color: #e0f7fa; /* Light Cyan */
+    /*background-color: #e0f7fa; /* Light Cyan */
+    background-color: #065a55; /* Dark Green (Proven Safe/Unvisited) */
+    color: white;
 }
 
 .cell.safe {
-    background-color: #e6ffe6; /* Light Green (Proven Safe/Unvisited) */
+    /*background-color: #e6ffe6; /* Light Green (Proven Safe/Unvisited) */
+    background-color: #065a06; /* Dark Green (Proven Safe/Unvisited) */
+    color: white;
 }
 
 .cell.danger-low {
     background-color: #fff3e0; /* Light Orange (Low/Moderate Probability) */
+    border-color: orange;
 }
 
 .cell.danger-high {
-    background-color: #ffcccc; /* Light Red (High Probability / Certain Danger) */
+    background-color: #aa5555; /* Light Red (High Probability / Certain Danger) */
+    border-color: red;
     animation: pulse-danger 1s infinite alternate;
 }
 

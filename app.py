@@ -14,68 +14,88 @@ agent = None
 world = None
 config = None 
 
+
+"""
+To clear confusion for code review:
+    I believe percepts are what the 
+"""
+
 def parse_coords(s):
+    # Takes in input coordinates and spits out their zero-index (assuming 1-indexed)
     try:
-        r, c = map(lambda x: int(x), s.split())
-        return r - 1, c - 1
+        row, column = s.split(",", 1)
+        print(row)
+        row = int(row)
+        col = column[:-1]
+        print(col)
+        print(len(col))
+        column = int(col)
+        return (row - 1, column - 1)
     except ValueError:
         raise ValueError(f"Invalid coordinate format: '{s}'. Expected 'row col' (1-indexed).")
 
-def parse_pit_list(s):
-    if not s:
-        return []
-    
-    pit_positions = []
-    for pair in s.split(','):
-        pair = pair.strip()
-        if not pair: continue
-        
-        if '[' in pair and ']' in pair:
-            start = pair.find('[') + 1
-            end = pair.find(']')
-            coords_str = pair[start:end].replace(',', ' ')
-        else:
-            coords_str = pair
-            
-        pit_positions.append(parse_coords(coords_str))
-    return pit_positions
+# unnecessary
+# def parse_pit_list(s):
+#     if not s:
+#         return []
+#
+#     pit_positions = []
+#     for pair in s.split(','):
+#         pair = pair.strip()
+#         if not pair: continue
+#
+#         if '[' in pair and ']' in pair:
+#             start = pair.find('[') + 1
+#             end = pair.find(']')
+#             coords_str = pair[start:end].replace(',', ' ')
+#         else:
+#             coords_str = pair
+#
+#         pit_positions.append(parse_coords(coords_str))
+#     return pit_positions
 
 def load_config_from_file(filepath):
-    config = {}
-    
+    config = dict()
+    config["SIZE"] = 4
+    config["START_POS"] = (0, 0)
+    config["PITS"] = set()
+    config["MAX_MOVES"] = 20
+
     try:
-        with open(filepath, 'r') as f:
-            for line in f:
+        with open(filepath, 'r') as config_file:
+            for line in config_file:
                 line = line.strip()
                 if not line or line.startswith('#'): continue
                 
                 try:
-                    key, value_with_comment = line.split(':', 1)
+                    key, value_with_comment = line.split('[', 1)
                 except ValueError:
-                    print(f"Skipping line without ':' separator: '{line}'", file=sys.stderr)
+                    print(f"Skipping line without '[' separator: '{line}'", file=sys.stderr)
                     continue
                     
                 key = key.strip().upper()
-                
-                if '#' in value_with_comment:
-                    value = value_with_comment.split('#')[0].strip()
-                else:
-                    value = value_with_comment.strip()
 
+                if '#' in value_with_comment:
+                    args = value_with_comment.split('#')[0].strip()
+                else:
+                    args = value_with_comment.strip()
+
+
+                print(f"Read line {line}")
                 try:
                     
-                    if key == 'SIZE': 
-                        config[key] = int(value)
-                    elif key == 'MAX_MOVES':
-                        config[key] = int(value)
-                    elif key == 'WUMPUS': 
-                        config[key] = parse_coords(value)
-                    elif key == 'GOLD': 
-                        config[key] = parse_coords(value)
-                    elif key == 'START': 
-                        config[key] = parse_coords(value)
-                    elif key == 'PITS': 
-                        config[key] = parse_pit_list(value)
+                    # if key == 'SIZE': 
+                    #     config[key] = int(value)
+                    # elif key == 'MAX_MOVES':
+                    #     config[key] = int(value)
+                    if key == 'W': 
+                        config["WUMPUS"] = parse_coords(args)
+                    elif key == 'G': 
+                        config["GOLD"] = parse_coords(args)
+                    # elif key == 'START': 
+                    #     config[key] = parse_coords(value)
+                    elif key == 'P': 
+                        config["PITS"].add(parse_coords(args))
                         
                 except Exception as e:
                     print(f"Error parsing line: '{line}'. Details: {e}", file=sys.stderr)
@@ -85,7 +105,7 @@ def load_config_from_file(filepath):
         print(f"Configuration file not found: {filepath}", file=sys.stderr)
         sys.exit(1)
         
-    required_keys = ['SIZE', 'WUMPUS', 'GOLD', 'PITS', 'START']
+    required_keys = ['WUMPUS', 'GOLD', 'PITS'] # Removed Size and Start
     missing_keys = [k for k in required_keys if k not in config]
     if missing_keys:
         print(f"Missing required configuration keys in {filepath}: {', '.join(missing_keys)}", file=sys.stderr)
@@ -94,19 +114,25 @@ def load_config_from_file(filepath):
     return config
 
 class WumpusWorld:
-    def __init__(self, size, wumpus_pos, pits, gold_pos):
-        self.size = size
+    """
+    models the objective truth about the game board.
+    """
+    def __init__(self, wumpus_pos, pits, paradise_pos):
+        self.size = 4
         self.wumpus_pos = wumpus_pos
         self.pits = pits
-        self.gold_pos = gold_pos
+        self.paradise_pos = paradise_pos
         self.breezes = set()
         self.stenches = set()
         self._generate_percepts()
+        assert not(wumpus_pos[0]<2 and wumpus_pos[1]<2), "Invalid wumpus starting position! You need to give the player a fair chance!"
+        for pit in pits:
+            assert not(pit[0]<2 and pit[1]<2), "Invalid pit starting position! You have to give the player a fair chance!"
 
-    def _get_neighbors(self, r, c):
+    def _get_neighbors(self, row, coolumn):
         neighbors = []
         for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-            nr, nc = r + dr, c + dc
+            nr, nc = row + dr, coolumn + dc
             if 0 <= nr < self.size and 0 <= nc < self.size:
                 neighbors.append((nr, nc))
         return neighbors
@@ -128,8 +154,8 @@ class WumpusWorld:
             percepts.add("Stench")
         if (r, c) in self.breezes:
             percepts.add("Breeze")
-        if (r, c) == self.gold_pos:
-            percepts.add("Glitter")
+        if (r, c) == self.paradise_pos:
+            percepts.add("Glowing") # NOTE: Changed from glitter to glowing, might need to change back
 
         return percepts
 
@@ -137,9 +163,12 @@ class WumpusWorld:
         return (r, c) == self.wumpus_pos or (r, c) in self.pits
 
 class WumpusAgent:
+    """
+    Represents our hero. Has access to their world and their knowledge base.
+    """
     def __init__(self, world, knowledge_size, start_pos, max_moves):
-        self.world = world
-        self.knowledge = AgentKnowledge(knowledge_size, start_pos)
+        self.world : WumpusWorld = world
+        self.knowledge : AgentKnowledge = AgentKnowledge(knowledge_size, start_pos)
         self.r, self.c = start_pos
         self.moves_made = 0
         self.max_moves = max_moves
@@ -162,9 +191,11 @@ class WumpusAgent:
             if not cell['visited'] and cell['is_safe']:
                 safe_unvisited_moves.append((nr, nc))
 
+        # Prioritize unvisited nodes.
         if safe_unvisited_moves:
-            return random.choice(safe_unvisited_moves)
+            return random.choice(safe_unvisited_moves) # Oh, it's random. Fair, but i would have preferred some hierarchy 
 
+        # Else, move back to known visited node
         visited_moves = [(nr, nc) for nr, nc in neighbors if self.knowledge.knowledge_map[nr][nc]['visited']]
         if visited_moves:
              return random.choice(visited_moves) 
@@ -212,21 +243,22 @@ class WumpusAgent:
         return True, f"Moved to ({new_r + 1}, {new_c + 1}). Percepts: {', '.join(percepts) if percepts else 'None'}"
 
 app = Flask(__name__)
-app.secret_key = b'_5#y2L"F4Q8z\n\xec]/' 
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/' # why do we need this??
 
 def init_game():
     global agent, world, config
     
     config_data = load_config_from_file(CONFIG_FILE)
     
-    GRID_SIZE = config_data['SIZE']
+    # NOTE: although never changed, we can dial if we wanted to
+    GRID_SIZE = 4
+    START_POS = (0,0)
     WUMPUS_POS = config_data['WUMPUS']
     GOLD_POS = config_data['GOLD']
     PIT_POSITIONS = config_data['PITS']
-    START_POS = config_data['START']
     MAX_MOVES = config_data.get('MAX_MOVES', 10)
 
-    world = WumpusWorld(GRID_SIZE, WUMPUS_POS, PIT_POSITIONS, GOLD_POS)
+    world = WumpusWorld(WUMPUS_POS, PIT_POSITIONS, GOLD_POS)
     agent = WumpusAgent(world, GRID_SIZE, START_POS, MAX_MOVES)
     config = config_data
     

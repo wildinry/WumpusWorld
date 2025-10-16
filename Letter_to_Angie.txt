@@ -24,5 +24,5 @@ The complete code, along with the `README.txt` and initial `KB.txt`, will be pro
 
 Sincerely,
 
-[Your Name / Group Name]
-Foundations of Artificial Intelligence Student
+Ryan, Jeff, and Danny
+
