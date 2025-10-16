@@ -1,7 +1,9 @@
-# README.txt - Wumpus World Agent Simulator
+# README - Wumpus World Agent Simulator
+
+By Ryan, Jeff, and Danny
 
 ## Project Overview
-This project implements a Wumpus World exploring agent using Python and the Flask web framework. The agent is designed to explore a 4x4 cave system, update its knowledge base after each move based on observed percepts (Stench, Breeze), and calculate the probability of danger (Wumpus or Pit) in unknown chambers. The output is a visually appealing, interactive webpage.
+This project implements a Wumpus World exploring agent using Python and the Flask web framework. The agent is designed to explore a 4x4 cave system, update its knowledge base after each move based on observed percepts (Stench, Breeze), and calculate the probability of danger (Wumpus or Pit) in unknown chambers. The output is a visually appealing, interactive webpage. This project is meant to show the implementation of propositional logic based algorithms.
 
 ## Implementation Details
 * **Language:** Python 3.x
