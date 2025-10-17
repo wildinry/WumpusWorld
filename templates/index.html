@@ -36,11 +36,14 @@
             <div class="controls-box">
                 <h2>Controls (1-indexed input)</h2>
                 <div class="controls-grid">
-                    <button class="move-btn" onclick="makeMove('up')">UP</button>
-                    <button class="move-btn" onclick="makeMove('left')">LEFT</button>
-                    <button class="move-btn" onclick="makeMove('right')">RIGHT</button>
-                    <button class="move-btn" onclick="makeMove('down')">DOWN</button>
+                    <button class="move-btn btn" onclick="makeMove('up')">UP</button>
+                    <button class="move-btn btn" onclick="makeMove('left')">LEFT</button>
+                    <button class="move-btn btn" onclick="makeMove('right')">RIGHT</button>
+                    <button class="move-btn btn" onclick="makeMove('down')">DOWN</button>
                 </div>
+                <button class="move-btn btn" onclick="decideMove()">Make Move</button>
+                <button class="btn" onclick="resetGame()">Reset</button>
+                <button class="btn" onclick="exportKnowledgeBase()">Export Knowledge</button>
             </div>
             
             <div class="query-box">
@@ -53,6 +56,7 @@
                     <p><strong>Inferred Percepts:</strong> <span id="query-inferred">...</span></p>
                     <p><strong>Prob. Pit:</strong> <span id="query-prob-pit">...</span></p>
                     <p><strong>Prob. Wumpus:</strong> <span id="query-prob-wumpus">...</span></p>
+                    <p><strong>Prob. Paradise:</strong> <span id="query-prob-paradise">...</span></p>
                 </div>
             </div>
         </div>
@@ -127,6 +131,36 @@
             lastActionElement.textContent = result.message;
             await updatePage();
         }
+
+
+        async function resetGame() {
+            const lastActionElement = document.getElementById('last-action');
+            lastActionElement.textContent = `None`;
+            
+            const response = await fetch(`/reset`, { method: 'POST' });
+            const result = await response.json();
+
+            // Enable controls.
+            document.querySelectorAll('.move-btn').forEach(btn => btn.disabled = false);
+
+            
+            await updatePage();
+        }
+
+        async function decideMove() {
+            const lastActionElement = document.getElementById('last-action');
+            lastActionElement.textContent = `None`;
+            
+            const response = await fetch(`/decide_move`, { method: 'POST' });
+            const result = await response.json();
+            
+            await updatePage();
+        }
+
+        async function exportKnowledgeBase() {
+            await fetch(`/export`, { method: 'POST' });
+        }
+
         
         async function handleQueryClick(r, c) {
             const response = await fetch(`/query/${r}/${c}`);
@@ -138,6 +172,7 @@
             document.getElementById('query-inferred').textContent = result.inferred_percepts || 'None';
             document.getElementById('query-prob-pit').textContent = `${(result.prob_pit * 100).toFixed(1)}%`;
             document.getElementById('query-prob-wumpus').textContent = `${(result.prob_wumpus * 100).toFixed(1)}%`;
+            document.getElementById('query-prob-paradise').textContent = `${(result.prob_paradise * 100).toFixed(1)}%`;
         }
 
         // --- Initialization ---

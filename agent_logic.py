@@ -12,9 +12,11 @@ class AgentKnowledge:
             [{
                 'visited': False,
                 'percepts': set(),
-                'is_safe': False,
+                'is_safe': False, # represents having neither dangers on the square
+                'absent': False,  # represents the absence of paradise. (is_safe) but for paradise
                 'prob_pit': 0.0,
-                'prob_wumpus': 0.0
+                'prob_wumpus': 0.0, 
+                'prob_paradise': 0.0
             } for _ in range(size)] for _ in range(size)
         ]
         
@@ -54,8 +56,10 @@ class AgentKnowledge:
         cell['visited'] = True
         cell['percepts'] = percepts
         cell['is_safe'] = True 
+        cell['absent'] = True
         cell['prob_pit'] = 0.0 
         cell['prob_wumpus'] = 0.0
+        cell['prob_paradise'] = 0.0
         
         # PROPOSITIONAL LOGIC: MODUS TOLLENS (Rule of Elimination)
         # If (r,c) is SAFE (true) AND silent (Breeze, Stench = false), 
@@ -67,6 +71,14 @@ class AgentKnowledge:
                     neighbor['is_safe'] = True
                     neighbor['prob_pit'] = 0.0
                     neighbor['prob_wumpus'] = 0.0
+
+        if not 'Glitter' in percepts:
+            for nr, nc in self._get_neighbors(r, c):
+                neighbor = self.knowledge_map[nr][nc]
+                if not neighbor['visited']:
+                    neighbor['absent'] = True
+                    neighbor['prob_paradise'] = 0.0
+
     
     def update_probabilities(self):
         """Recalculate probabilities based on all visited cells with percepts."""
@@ -81,16 +93,18 @@ class AgentKnowledge:
                 
         pit_evidence = {}
         wumpus_evidence = {}
+        paradise_evidence = {}
         
+        # For all rows r and for all columns c
         for r in range(self.size):
             for c in range(self.size):
                 cell = self.knowledge_map[r][c]
-                if cell['visited']:
+                if cell['visited']: # where (r,c) is visited
                     
                     # Breeze Calculation (Pit Probability)
                     if 'Breeze' in cell['percepts']:
                         all_neighbors = self._get_neighbors(r, c)
-                        unknown_neighbors = [pos for pos in all_neighbors if not self.knowledge_map[pos[0]][pos[1]]['is_safe']]
+                        unknown_neighbors = [pos for pos in all_neighbors if not self.knowledge_map[pos[0]][pos[1]]['is_safe']] # consider all non-safe neighbors as unknown
 
                         # PROPOSITIONAL LOGIC: DEDUCTION BY ELIMINATION
                         # If Breeze is present, and only ONE neighbor is not proven safe, 
@@ -124,6 +138,23 @@ class AgentKnowledge:
                             prob_increment = 1.0 / len(unknown_neighbors)
                             for nr, nc in unknown_neighbors:
                                 wumpus_evidence[(nr, nc)] = wumpus_evidence.get((nr, nc), []) + [prob_increment]
+
+                     # Paradise Calculation (Wumpus Probability)
+                    if 'Glitter' in cell['percepts']:
+                        all_neighbors = self._get_neighbors(r, c)
+                        unknown_neighbors = [pos for pos in all_neighbors if not self.knowledge_map[pos[0]][pos[1]]['absent']]
+
+                        # PROPOSITIONAL LOGIC: DEDUCTION BY ELIMINATION
+                        if len(unknown_neighbors) == 1:
+                            nr, nc = unknown_neighbors[0]
+                            self.knowledge_map[nr][nc]['prob_paradise'] = 1.0 # Certainty
+                            self.knowledge_map[nr][nc]['absent'] = False # Not safe!
+
+                        # PROBABILISTIC INFERENCE (Only if Elimination fails)
+                        elif len(unknown_neighbors) > 1:
+                            prob_increment = 1.0 / len(unknown_neighbors)
+                            for nr, nc in unknown_neighbors:
+                                paradise_evidence[(nr, nc)] = paradise_evidence.get((nr, nc), []) + [prob_increment]
         
         # 3. Apply the maximum evidence for probabilistic distribution cases
         for (r, c), evidences in pit_evidence.items():
@@ -136,6 +167,11 @@ class AgentKnowledge:
             current_prob = self.knowledge_map[r][c]['prob_wumpus']
             if current_prob < 1.0:
                 self.knowledge_map[r][c]['prob_wumpus'] = max(current_prob, max(evidences))
+
+        for (r, c), evidences in paradise_evidence.items():
+            current_prob = self.knowledge_map[r][c]['prob_paradise']
+            if current_prob < 1.0:
+                self.knowledge_map[r][c]['prob_paradise'] = max(current_prob, max(evidences))
                                 
     def query(self, r, c):
         """Replies with the status of any chamber based on agent knowledge."""
@@ -150,7 +186,8 @@ class AgentKnowledge:
             'percepts_observed': 'None',
             'inferred_percepts': 'None',
             'prob_pit': cell['prob_pit'],
-            'prob_wumpus': cell['prob_wumpus']
+            'prob_wumpus': cell['prob_wumpus'],
+            'prob_paradise': cell['prob_paradise']
         }
         
         # Status Logic
@@ -172,6 +209,9 @@ class AgentKnowledge:
                 inferred_list.append("Pit CERTAIN (Prob=1.0)")
             if cell['prob_wumpus'] >= 1.0:
                 inferred_list.append("Wumpus CERTAIN (Prob=1.0)")
+            if cell['prob_paradise'] >= 1.0:
+                inferred_list.append("Paradise CERTAIN (Prob=1.0)")
+
 
             if inferred_list:
                 response['inferred_percepts'] = " / ".join(inferred_list)
@@ -197,7 +237,7 @@ class AgentKnowledge:
                     display_symbol = 'A'
                 elif cell['visited']:
                     percepts = "".join([p[0] for p in cell['percepts'] if p in ('Breeze', 'Stench', 'Glitter')])
-                    display_symbol = percepts if percepts else 'V'
+                    display_symbol = percepts if percepts else ''
                 
                 danger_class = ''
                 total_prob = cell['prob_pit'] + cell['prob_wumpus']
@@ -206,11 +246,35 @@ class AgentKnowledge:
                 elif total_prob > 0.0:
                     danger_class = 'danger-low'
                 
+                hope_class = ''
+                if cell['prob_paradise'] > 0.9:
+                    hope_class = 'hope-high'
+                elif cell['prob_paradise'] > 0.0:
+                    hope_class = 'hope-low'
+                
                 grid_data.append({
                     'r': r, 'c': c,
                     'symbol': display_symbol,
-                    'class': f'{cell_class} {danger_class}',
+                    'class': f'{cell_class} {danger_class} {hope_class}',
                     'r_1idx': r + 1, 'c_1idx': c + 1 
                 })
         
         return grid_data
+    
+    def export_to(self, filename : str):
+        with open(filename, "w") as file:
+            for r in range(self.size):
+                for c in range(self.size):
+                    cell = self.knowledge_map[r][c]
+                    file.write(
+f"""Square({r+1}, {c+1}):
+    visited:            {cell['visited']}
+    known_safe:         {cell["is_safe"]}
+    paradise_absence:   {cell["absent"]}
+    percepts:           {cell["percepts"]}
+    prob_pit:       {cell["prob_pit"]}
+    prob_wumpus:    {cell["prob_wumpus"]}
+    prob_paradise:  {cell["prob_paradise"]}
+\n"""
+                    )
+
