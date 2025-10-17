@@ -25,7 +25,7 @@ source ./venv/bin/activate
 2.  **File Structure:** Maintain the structure provided: `app.py`, `agent_logic.py`, `wumpus_config.txt`, `templates/`, and `static/`.
 3.  **Run Program:** Execute the main application file from the command line:
     ```bash
-    python app.py
+    python wumpus.py
     ```
 4.  **Access:** Open your web browser and navigate to the local address provided by Flask (typically `http://127.0.0.1:5000/`).
 
