@@ -4,25 +4,17 @@ Tuesday, October 14, 2025
 
 Dear Angie,
 
-We were delighted to hear from you and are happy to assist with the Wumpus World booth for the fair. It sounds like a fun (and challenging) project for a Foundations of Artificial Intelligence class.
-
-We have successfully programmed an agent that meets all of your specifications. Our solution is a fully functional Python-based program that uses the Flask framework to provide a visually engaging web interface, moving it far beyond simple terminal text.
-
-### Program Capabilities:
-
-1.  **Initialization:** The program successfully loads the cave system configuration from a `.txt` file, allowing for easy setup of different rounds (as required for the in-class demonstration).
-2.  **Agent Logic:** The agent explores the 4x4 grid and is currently limited to your requested ten moves (if not forced into a deadly chamber earlier). After each move, it performs an observation and updates its internal **Knowledge Base (KB)**.
-3.  **Knowledge Base Update:** Our logic strictly adheres to the rules of inference (e.g., Stench means Wumpus is adjacent). The probability calculation is implemented as requested: for a percept (Breeze/Stench), the probability of the corresponding danger (Pit/Wumpus) is distributed equally among all adjacent **unknown** chambers.
-4.  **Query Interface:** The web interface allows your friend to click on any chamber to query its status. The system replies with:
-    * **SAFE** (confirmed no Pit/Wumpus).
-    * **UNKNOWN** (unvisited, not yet proven safe).
-    * **DEFINITELY DANGEROUS** (Prob = 1.0).
-    * **Percept Information** (Breeze/Stench, if visited).
-    * **Probability of Pit/Wumpus** (0.0 to 1.0).
-
-The complete code, along with the `README.txt` and initial `KB.txt`, will be provided via the Canvas link. We look forward to the in-class demonstration on October 21st. We appreciate the opportunity to apply our learning to a real-world (or at least, fair-world) application!
+Thank you for getting to us and we would be delighted to help you with your problem. As of right now our program has all the specifications asked of you, this is a fully functioning program that runs in python with flask integration to provide a functional and appealing web interface.
+Our programs’ capabilities are of the following:
+The world will be created and populated with ‘pits’ a ‘paradise’ and a ‘Wumpus’ from a “.txt” file provided by you to allow an easy setup between different levels.
+Our agent will explore the world limited to a 4x4 grid and as of right now is limited to the requested ten moves. Its logic is adhering to the rules provided (i.e., Stench means Wumpus is adjacent, breeze means pit is adjacent). The probability calculations are implemented as requested and shows the probability of danger that is distributed between all adjacent “unknown” Chambers.
+Our web interface allows your friend to click any chamber to query its status. The system will reply with the following:
+	“Safe”(a confirmed safe area, with no pits nor Wumpus)
+	“Unknown”(an unvisited, or not proven safe area)
+	“Dangerous”(Known dangerous tile containing either a pit or Wumpus)
+	“Percept Information”(tile containing breeze or stench)
+	“Probability of Pit/Wumpus”(the probability of an unknown tile or dangerous tile)
+The complete code, along with the ‘ReadMe.txt’ and the initial “KB.txt”, will be provided in our canvas link, and the day of the in-class demonstration on October 21st. We appreciate the opportunity and look forward to revealing our hard work to you.
 
 Sincerely,
-
-Ryan, Jeff, and Danny
-
+Ryan, Danny, and Jeff
