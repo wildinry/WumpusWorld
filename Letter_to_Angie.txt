@@ -8,11 +8,16 @@ In addition, We were intrigued to ensure the program is visually appealing and f
 With this in mind, Our program runs in Python using the Flask Module to provide a functional and appealing web interface.
 
 We ensured that our programs’ capabilities meet the requirements of:  
-	First, having the capability of creating the world and populating with ‘pits’, a ‘paradise’, and a ‘Wumpus’ from a “.txt” file that will be provided to allow an easy setup. 
+	First, having the capability of creating the world and populating with ‘pits’, a ‘paradise’, 
+	and a ‘Wumpus’ from a “.txt” file that will be provided to allow an easy setup. 
 	Second, the agent will explore the world limited to a 4x4 grid and as of right now is limited to the requested ten moves. Its logic is adhering to the rules provided (i.e., Stench means Wumpus is adjacent, breeze means pit is adjacent). 
-	Lastly Our web interface allows you to click any chamber to query its status. The system will reply with one of the following: “Safe”(a confirmed safe area, with no pits nor Wumpus), “Unknown”(an unvisited, or not proven safe area), “Dangerous”(Known dangerous tile containing either a pit or Wumpus), “Percept Information”(tile containing breeze or stench). and "Probability"(probability of being near a wumpus, pit or paradise). 
+	Lastly Our web interface allows you to click any chamber to query its status. The system will reply with one of the following: “Safe”(a confirmed safe area, with no pits nor Wumpus), 
+“Unknown”(an unvisited, or not proven safe area), “Dangerous”(Known dangerous tile containing either a pit or Wumpus), “Percept Information”(tile containing breeze or stench), 
+and "Probability"(probability of being near a wumpus, pit or paradise). 
 
-The complete code, along with the ‘ReadMe.txt’ and the initial “KB.txt”, will be provided in our canvas link, and the day of the in-class demonstration on October 21st. We appreciate the opportunity of solving this problem and look forward to revealing our hard work to you.
+The complete code, along with the ‘ReadMe.txt’ and the initial “KB.txt”, will be provided in our canvas link, 
+and the day of the in-class demonstration on October 21st. We appreciate the opportunity of solving this problem 
+and look forward to revealing our hard work to you.
 
 Sincerely,
 Ryan, Danny, and Jeff
