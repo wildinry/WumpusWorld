@@ -40,8 +40,18 @@ Python 3 is usually pre-installed. If not, use your system's package manager.
     sudo apt update
     sudo apt install python3 python3-venv
     ```
+### 2. Clone Github Repository
 
-### Optional: you may want to start a virtual environment with the following commands:
+Obtain the repository containing the files needed to run WumpusWorld directly to a computer directory.
+```bash
+    sudo mkdir wumpusWorld
+    cd wumpusWorld
+    git clone https://github.com/wildinry/WumpusWorld
+    cd WumpusWorld
+```
+    
+
+### 3. Create a virtual environment with the following commands:
 
 Linux/Unix/WSL (**Recommended**, this was our method)
 ```bash
