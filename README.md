@@ -46,7 +46,7 @@ Obtain the repository containing the files needed to run WumpusWorld directly to
 ```bash
     sudo mkdir wumpusWorld
     cd wumpusWorld
-    git clone https://github.com/wildinry/WumpusWorld
+    git clone https://github.com/wildinry/WumpusWorld.git
     cd WumpusWorld
 ```
     
