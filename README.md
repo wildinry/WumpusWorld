@@ -13,6 +13,34 @@ This project implements a Wumpus World exploring agent using Python and the Flas
 * **Interface:** A web page served by Flask allows for move controls and a visual representation of the agent's knowledge map.
 
 ## Requirements and Setup
+### 1. Python Installation
+
+The project requires **Python 3.6** or newer.
+
+#### Windows Installation
+
+1.  **Download:** Get the latest Python 3 installer from the [official Python website](https://www.python.org/downloads/windows/).
+2.  **Run Installer:** Execute the downloaded file.
+3.  **Crucial Step:** On the first installer screen, **check the box** that says **"Add python.exe to PATH"** before clicking "Install Now." This allows you to run Python commands from any terminal window.
+4.  **Verify:** Open a new Command Prompt or PowerShell and confirm the installation:
+    ```bash
+    python --version
+    ```
+
+#### Linux/WSL Installation
+
+Python 3 is usually pre-installed. If not, use your system's package manager.
+
+1.  **Verify:** Open a terminal and check the version:
+    ```bash
+    python3 --version
+    ```
+2.  **Install (e.g., Debian/Ubuntu):**
+    ```bash
+    sudo apt update
+    sudo apt install python3 python3-venv
+    ```
+
 #### Optional: you may want to start a virtual environment with the following commands:
 
 Linux/Unix/WSL (**Recommended**, this was our method)
