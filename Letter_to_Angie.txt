@@ -9,8 +9,11 @@ Our solution is a fully functional Python-based program that uses the Flask fram
 ### Program Capabilities:
 
 1.  **Initialization:** The program successfully loads the cave system configuration from a `.txt` file, allowing for easy setup of different rounds (as required for the in-class demonstration).
-2.  **Agent Logic:** The agent explores the 4x4 grid and is currently limited to your requested ten moves (if not forced into a deadly chamber earlier). After each move, it performs an observation and updates its internal **Knowledge Base (KB)**.
-3.  **Knowledge Base Update:** Our logic strictly adheres to the rules of inference (e.g., Stench means Wumpus is adjacent). The probability calculation is implemented as requested: for a percept (Breeze/Stench), the probability of the corresponding danger (Pit/Wumpus) is distributed equally among all adjacent **unknown** chambers.
+2.  **Agent Logic:** The agent explores the 4x4 grid and is currently limited to your requested ten moves 
+(if not forced into a deadly chamber earlier). After each move, it performs an observation and updates its internal **Knowledge Base (KB)**.
+3.  **Knowledge Base Update:** Our logic strictly adheres to the rules of inference 
+(e.g., Stench means Wumpus is adjacent). The probability calculation is implemented as requested: 
+for a percept (Breeze/Stench), the probability of the corresponding danger (Pit/Wumpus) is distributed equally among all adjacent **unknown** chambers.
 4.  **Query Interface:** The web interface allows your friend to click on any chamber to query its status. The system replies with:
     * **SAFE** (confirmed no Pit/Wumpus).
     * **UNKNOWN** (unvisited, not yet proven safe).
